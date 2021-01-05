@@ -1,12 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {UserService} from "../../services/user-service.service";
 import {User} from "../../domain/user";
-import {HttpHeaders} from "@angular/common/http";
 
 @Component({
   selector: 'app-user-list',
-  templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.scss']
+  templateUrl: './user-list.component.html'
 })
 export class UserListComponent implements OnInit {
 
@@ -17,14 +15,16 @@ export class UserListComponent implements OnInit {
 
   public ngOnInit() {
     this.userService.findAll().subscribe(data => {
-      this.users = data['_embedded']['users'];
+      this.users = data;
       console.log('users:', data);
     });
   }
 
   public deleteUser(id: string): void {
-    this.userService.deleteById(id).subscribe(() =>
-      console.log('User by id = ', id, ' is deleted'));
+    this.userService.deleteById(id).subscribe(() => {
+      this.users = this.users.filter(u => u.id !== id);
+      console.log('User by id = ', id, ' is deleted');
+    });
   }
 
   /*
@@ -33,7 +33,10 @@ export class UserListComponent implements OnInit {
     Access-Control-Allow-Headers: Content-Type, Authorization
    */
   public deleteAll(): void {
-    this.userService.deleteAll().subscribe(() =>
-      console.log('All users were deleted'));
+    this.userService.deleteAll().subscribe(() => {
+        this.users = [];
+        console.log('All users were deleted');
+      }
+    )
   }
 }
